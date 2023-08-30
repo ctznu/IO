@@ -68,7 +68,6 @@ public class ChatGroupServer {
             }
 
         } catch (IOException e) {
-//            e.printStackTrace();
             try {
                 System.out.println(channel.getRemoteAddress() + " is disconnected.");
                 key.cancel();
