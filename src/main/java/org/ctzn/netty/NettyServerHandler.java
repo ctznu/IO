@@ -9,6 +9,10 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.EventExecutorGroup;
 
+import java.sql.Time;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -20,13 +24,28 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             @Override
             public void run() {
                     try {
-                    Thread.sleep(10 * 1000);
-                    ctx.writeAndFlush(Unpooled.copiedBuffer("Hello client! lala", CharsetUtil.UTF_8));
+                    Thread.sleep(5 * 1000);
+                    ctx.writeAndFlush(Unpooled.copiedBuffer("Hello client lala! current time: " + new Date(), CharsetUtil.UTF_8));
+
+                    System.out.println("current time" + new Date());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
+
+        // solution 2: 用户自定义定时任务 该任务是提交到 scheduleTaskQueue 中
+        ctx.channel().eventLoop().schedule(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5 * 1000);
+                    ctx.writeAndFlush(Unpooled.copiedBuffer("Hello client haha! current time: " + new Date(), CharsetUtil.UTF_8));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 5, TimeUnit.SECONDS);
 
 //        System.out.println("server ctx: " + ctx);
 //        ByteBuf buf = (ByteBuf) msg;
@@ -37,7 +56,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 //        ctx.flush();
-        ctx.writeAndFlush(Unpooled.copiedBuffer("Hello client!", CharsetUtil.UTF_8));
+        ctx.writeAndFlush(Unpooled.copiedBuffer("Hello client! current time: " + new Date(), CharsetUtil.UTF_8));
+        System.out.println("current time" + new Date());
     }
 
     @Override
